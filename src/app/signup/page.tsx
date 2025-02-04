@@ -8,12 +8,13 @@ export default function Signup() {
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [userName, setuserName] = useState(""); 
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            const res = await axios.post("/api/auth/signup", { email, password });
+            const res = await axios.post("/api/auth/signup", { email, password,userName });
             if (res.status === 201) {
                 toast.success("Signup successful! Redirecting...");
                 setTimeout(() => router.push("/login"), 1500);
@@ -47,6 +48,14 @@ export default function Signup() {
                     className="border p-2 rounded w-full mb-4"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+                <input
+                    type="userName"
+                    placeholder="userName"
+                    className="border p-2 rounded w-full mb-2"
+                    value={userName}
+                    onChange={(e) => setuserName(e.target.value)}
                     required
                 />
                 <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full">Signup</button>

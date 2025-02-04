@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     await connect();
 
     try {
-        const { email, password } = await req.json();
+        const { email, password,userName } = await req.json();
 
         // Check if user already exists
         const existingUser = await User.findOne({ email });
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Create new user
-        const newUser = new User({ email, password });
+        const newUser = new User({ email, password,userName });
         await newUser.save();
 
         // Generate JWT

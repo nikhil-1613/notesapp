@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+
+    userName:{
+        type:String,
+        required:true,
+    }
 })
 const User = mongoose.models.users || mongoose.model("users", userSchema);
 export default User;
