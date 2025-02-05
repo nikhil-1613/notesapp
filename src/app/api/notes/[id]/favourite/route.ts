@@ -5,8 +5,7 @@ import { verifyToken } from "@/lib/jwt";
 import { JwtPayload } from "jsonwebtoken";
 import { cookies } from "next/headers";
 
-// Corrected function signature for Next.js route handling
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   await connect();
 
   try {
@@ -20,7 +19,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const { id } = params; // Correctly access params
+    // ✅ Await params to resolve the async object
+    const { id } = await context.params; 
+
     const { favorite } = await req.json();
 
     const updatedNote = await Note.findByIdAndUpdate(id, { favorite }, { new: true });
