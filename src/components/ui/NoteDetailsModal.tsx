@@ -252,16 +252,16 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
         </div>
 
         {imageUrl ? (
-        <div className="flex justify-center">
-          <img 
-          src={imageUrl} 
-          alt="Uploaded" 
-          className="mb-4 max-w-[80px] max-h-[80px] object-contain rounded border border-gray-300 shadow-sm"
-          />
-          </div>  
-          ) : (
-          <p className="text-gray-500 text-sm mb-4 text-center">No images available to display.</p>
-            )}
+  <div className="flex justify-center">
+    <img 
+      src={imageUrl} 
+      alt="Uploaded" 
+      className="mb-4 max-w-[120px] max-h-[120px] sm:max-w-[150px] sm:max-h-[150px] md:max-w-[200px] md:max-h-[200px] lg:max-w-[250px] lg:max-h-[250px] object-contain rounded border border-gray-300 shadow-sm transition-all"
+    />
+  </div>  
+) : (
+  <p className="text-gray-500 text-sm mb-4 text-center">No images available to display.</p>
+)}
 
         <div className="flex justify-between items-center">
           {isMaximized && (
