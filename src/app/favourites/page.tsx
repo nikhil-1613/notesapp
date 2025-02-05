@@ -25,6 +25,7 @@ export default function Favourites() {
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [isNoteDetailsModalOpen, setIsNoteDetailsModalOpen] = useState(false);
+  const [username, setUsername] = useState("");
 
   // Fetch favorite notes from API
   useEffect(() => {
@@ -41,7 +42,17 @@ export default function Favourites() {
   
     fetchFavoriteNotes();
   }, []);
-  
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("/api/auth/me", { withCredentials: true });
+        setUsername(res.data.user.userName);
+      } catch (error) {
+        console.error("Failed to fetch user", error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const openNoteDetails = (note: Note) => {
     setSelectedNote(note);
@@ -75,8 +86,8 @@ export default function Favourites() {
             <li className="bg-purple-200 p-2 rounded mb-2">Favourites</li>
           </ul>
         </nav>
-        <div className="absolute bottom-4">
-          <p className="text-gray-500">Emmanual Vincent</p>
+        <div className="absolute bottom-4 ml-[80px]">
+        <p className="text-gray-500">{username || "Guest"}</p>
         </div>
       </aside>
 

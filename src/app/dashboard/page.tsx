@@ -77,7 +77,7 @@ export default function Dashboard() {
 
     fetchNotes();
   }, []);
-
+  
   // Open/Close Modal Functions
   const openNoteModal = () => {
     setIsNoteModalOpen(true);
@@ -217,8 +217,8 @@ export default function Dashboard() {
         <h2 className="text-lg font-bold mb-4">ALL Notes</h2>
         <nav>
           <ul>
-            <li className="bg-purple-200 p-2 rounded mb-2">Home</li>
-            <li className="text-gray-400 p-2 rounded" onClick={() => router.push("/favourites")}>Favourites</li>
+            <li className="bg-purple-200 p-2 rounded mb-2 cursor-pointer">Home</li>
+            <li className="text-gray-400 p-2 rounded cursor-pointer" onClick={() => router.push("/favourites")}>Favourites</li>
           </ul>
         </nav>
 

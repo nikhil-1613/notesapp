@@ -115,12 +115,12 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
         imageUrl: updatedImageUrl, // Ensure `imageUrl` is sent
       });
   
-      console.log("✅ Note Updated:", updateNoteResponse.data);
+      console.log("Note Updated:", updateNoteResponse.data);
       setImageUrl(updatedImageUrl);
   
       toast.success("Image uploaded successfully!");
     } catch (error) {
-      console.error("❌ Upload Error:", error);
+      console.error(" Upload Error:", error);
       toast.error("Image upload failed.");
     }
   };
@@ -196,7 +196,7 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
                 </button>
               )}
 
-              <button onClick={toggleFavorite} className={`p-2 rounded ${newFavorite ? "text-red-500" : "text-gray-500"}`}>
+              <button onClick={toggleFavorite} className={`p-2 rounded ${newFavorite ? "text-red-500 fill-red-600" : "text-gray-500"}`}>
                 <Heart className="w-4 h-4" />
               </button>
             </div>
