@@ -84,13 +84,13 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   }
 }
 
-
-export async function GET(req: NextRequest, context: { params: { id: string } }) {
+// Define the GET handler with async params
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   await connect(); // Ensure database connection
 
   try {
-    // 🔹 Correctly access `params.id`
-    const { id } = await context.params;
+    // 🔹 Correctly access `params.id` and resolve the Promise
+    const { id } = await context.params; 
     console.log("🔄 Fetching Note:", id);
 
     const note = await Note.findById(id);
@@ -104,3 +104,24 @@ export async function GET(req: NextRequest, context: { params: { id: string } })
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+
+// export async function GET(req: NextRequest, context: { params: { id: string } }) {
+//   await connect(); // Ensure database connection
+
+//   try {
+//     // 🔹 Correctly access `params.id`
+//     const { id } = await context.params;
+//     console.log("🔄 Fetching Note:", id);
+
+//     const note = await Note.findById(id);
+//     if (!note) {
+//       return NextResponse.json({ error: "Note not found" }, { status: 404 });
+//     }
+
+//     return NextResponse.json(note, { status: 200 });
+//   } catch (error) {
+//     console.error("❌ Error fetching note:", error);
+//     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+//   }
+// }
