@@ -56,62 +56,16 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
   }
 }
 
-// export async function PUT(req: Request, context: { params: { id: string } }) {
-//   await connect(); // Ensure database connection
 
-//   try {
-//     const cookieStore = cookies();
-//     const token = (await cookieStore).get("token");
-
-//     if (!token) {
-//       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-//     }
-
-//     const decoded = verifyToken(token.value) as JwtPayload;
-//     if (!decoded || !decoded.userId) {
-//       return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
-//     }
-
-//     // 🔹 Parse request body
-//     const { title, content, favorite, imageUrl } = await req.json();
-
-//     // 🔹 Ensure `params` is resolved before accessing
-//     const { id: noteId } = context.params;
-
-//     if (!noteId) {
-//       return NextResponse.json({ error: "Note ID is required" }, { status: 400 });
-//     }
-
-//     console.log("🔄 Updating Note ID:", noteId);
-//     console.log("🖼️ New Image URL:", imageUrl);
-
-//     // 🔹 Find and update the note (ENSURE IMAGE IS UPDATED)
-//     const updatedNote = await Note.findByIdAndUpdate(
-//       noteId,
-//       { $set: { title, content, favorite, imageUrl } }, // 🔥 Explicitly setting `imageUrl`
-//       { new: true }
-//     );
-
-//     if (!updatedNote) {
-//       return NextResponse.json({ error: "Note not found" }, { status: 404 });
-//     }
-
-//     console.log("✅ Updated Note:", updatedNote);
-
-//     return NextResponse.json({ message: "✅ Note updated successfully", note: updatedNote }, { status: 200 });
-//   } catch (error) {
-//     console.error("❌ Error updating note:", error);
-//     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-//   }
-// }
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
-
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    await connect();
+    // Await to resolve params before accessing
+    const { id } = await context.params;
+    
+    await connect(); // Ensure database connection
 
     // Authenticate the user (check token from cookies)
-    const token = (await cookies()).get("token");
+    const token = await cookies().get("token");
     if (!token) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
@@ -129,10 +83,39 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
     return NextResponse.json({ message: "Note deleted successfully" }, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error deleting note:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+// export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+//   const { id } = params;
+
+//   try {
+//     await connect();
+
+//     // Authenticate the user (check token from cookies)
+//     const token = (await cookies()).get("token");
+//     if (!token) {
+//       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+//     }
+
+//     const decoded = verifyToken(token.value);
+//     if (!decoded) {
+//       return NextResponse.json({ error: "Invalid token" }, { status: 403 });
+//     }
+
+//     // Proceed with deleting the note
+//     const note = await Note.findByIdAndDelete(id);
+//     if (!note) {
+//       return NextResponse.json({ error: "Note not found" }, { status: 404 });
+//     }
+
+//     return NextResponse.json({ message: "Note deleted successfully" }, { status: 200 });
+//   } catch (error) {
+//     console.error(error);
+//     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+//   }
+// }
 
 // Define the GET handler with async params
 export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
