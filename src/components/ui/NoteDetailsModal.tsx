@@ -50,6 +50,7 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
       await navigator.clipboard.writeText(note.content);
       toast.success("Note copied to clipboard!");
     } catch (error) {
+      console.log("Error in copying text to clipboard")
       toast.error("Failed to copy text.");
     }
   };
@@ -61,6 +62,7 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
       onDelete(note._id);
       onClose();
     } catch (error) {
+      console.log("Error deleting note",error)
       toast.error("Error deleting note.");
     }
   };
@@ -79,6 +81,7 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
       setIsEditing(false);
       setShowSaveButton(false);
     } catch (error) {
+      console.log("Error saving note.",error)
       toast.error("Error saving note.");
     }
   };
@@ -122,93 +125,6 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
     }
   };
   
-  // const handleUploadImage = async () => {
-  //   if (!image) {
-  //     toast.error("No image selected.");
-  //     return;
-  //   }
-  
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append("image", image);
-  
-  //     const uploadResponse = await axios.post(`/api/upload-image?noteId=${note._id}`, formData, {
-  //       headers: { "Content-Type": "multipart/form-data" },
-  //     });
-  
-  //     console.log("✅ Upload Response:", uploadResponse.data); // Debugging
-  
-  //     const updatedImageUrl = uploadResponse.data.url;
-  //     setImageUrl(updatedImageUrl);
-  
-  //     // 🔄 Fetch the updated note to ensure imageUrl is stored correctly
-  //     const updatedNoteResponse = await axios.get(`/api/notes/${note._id}`);
-  //     console.log("🔄 Updated Note:", updatedNoteResponse.data);
-  
-  //     setNewTitle(updatedNoteResponse.data.title);
-  //     setNewContent(updatedNoteResponse.data.content);
-  //     setNewFavorite(updatedNoteResponse.data.favorite);
-  //     setImageUrl(updatedNoteResponse.data.imageUrl);
-  
-  //     toast.success("Image uploaded successfully!");
-  //   } catch (error: unknown) {
-  //     if (axios.isAxiosError(error)) {
-  //       console.error(" Axios Error:", error.response?.data || error.message);
-  //       toast.error(error.response?.data?.error || "API request failed.");
-  //     } else if (error instanceof Error) {
-  //       console.error(" General Error:", error.message);
-  //       toast.error(error.message || "An unexpected error occurred.");
-  //     } else {
-  //       console.error(" Unknown Error:", error);
-  //       toast.error("Something went wrong.");
-  //     }
-  //   }
-  // };
-  
-  // const handleUploadImage = async () => {
-  //   if (!image) {
-  //     toast.error("No image selected.");
-  //     return;
-  //   }
-  
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append("image", image);
-  
-  //     const uploadResponse = await axios.post(`/api/upload-image?noteId=${note._id}`, formData, {
-  //       headers: { "Content-Type": "multipart/form-data" },
-  //     });
-  
-  //     const updatedImageUrl = uploadResponse.data.url;
-  //     setImageUrl(updatedImageUrl);
-  
-  //     // 🔥 Fetch updated note after upload
-  //     // const updatedNote = await axios.get(`/api/notes/${note._id}`);
-  //     // setNewTitle(updatedNote.data.title);
-  //     // setNewContent(updatedNote.data.content);
-  //     // setNewFavorite(updatedNote.data.favorite);
-  //     // setImageUrl(updatedNote.data.imageUrl);
-  
-  //     toast.success("Image uploaded successfully!");
-  //   }catch (error: unknown) {
-  //     if (axios.isAxiosError(error)) {
-  //       // 🔹 Axios-specific error (network issues, API failures)
-  //       console.error("❌ Axios Error:", error.response?.data || error.message);
-  //       toast.error(error.response?.data?.error || "API request failed.");
-  //     } else if (error instanceof Error) {
-  //       // 🔹 General JavaScript error (e.g., TypeError, ReferenceError)
-  //       console.error("❌ General Error:", error.message);
-  //       toast.error(error.message || "An unexpected error occurred.");
-  //     } else {
-  //       // 🔹 Unknown error type (should rarely happen)
-  //       console.error("❌ Unknown Error:", error);
-  //       toast.error("Something went wrong.");
-  //     }
-  //   }
-    
-  // };
-  
-
   const toggleFavorite = async () => {
     try {
       const updatedFavorite = !newFavorite;
@@ -232,6 +148,8 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
           <button onClick={onClose} className="p-2 bg-red-500 text-white rounded">
             <X className="w-4 h-4" />
           </button>
+          {/* test */}
+          {showSaveButton && <button></button>}
         </div>
 
         <div className="mb-4 mt-6">

@@ -64,7 +64,7 @@ export default function Signup() {
                     className="text-blue-400 text-center mt-4 cursor-pointer hover:underline"
                     onClick={() => router.push("/login")}
                 >
-                    Already have an account? Let's login
+                    Already have an account? Lets login
                 </p>
             </form>
         </div>

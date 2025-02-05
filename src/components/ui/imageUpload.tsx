@@ -51,6 +51,9 @@ const ImageUpload: React.FC<Props> = ({ noteId }) => {
       console.error("❌ Upload Error:", error);
       toast.error("Something went wrong.");
     }
+    finally{
+      setUploading(false)
+    }
   };
   
 

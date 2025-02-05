@@ -34,20 +34,20 @@ export default function Dashboard() {
   const [isNoteDetailsModalOpen, setIsNoteDetailsModalOpen] = useState(false);
   const [username, setUsername] = useState("");
 
- 
+
 
   useEffect(() => {
-      const fetchUser = async () => {
-          try {
-              const res = await axios.get("/api/auth/me", { withCredentials: true });
-              setUsername(res.data.user.userName);
-          } catch (error) {
-              console.error("Failed to fetch user", error);
-          }
-      };
-      fetchUser();
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("/api/auth/me", { withCredentials: true });
+        setUsername(res.data.user.userName);
+      } catch (error) {
+        console.error("Failed to fetch user", error);
+      }
+    };
+    fetchUser();
   }, []);
-  
+
 
 
   const openNoteDetails = (note: Note) => {
@@ -100,19 +100,30 @@ export default function Dashboard() {
     setTranscript("");
     toast.success("Recording started...");
 
-    const recognition = new (window.SpeechRecognition || (window as any).webkitSpeechRecognition)();
+    // const recognition = new (window.SpeechRecognition || (window as any).webkitSpeechRecognition)();
+    const SpeechRecognition =
+      window.SpeechRecognition || (window as unknown as { webkitSpeechRecognition: typeof window.SpeechRecognition }).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      throw new Error("Speech recognition is not supported in this browser.");
+    }
+
+    const recognition = new SpeechRecognition();
+
     recognition.lang = "en-IN";
     recognition.interimResults = false;
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       const transcript = event.results[0][0].transcript;
       setTranscript(transcript);
     };
 
     recognition.onstart = () => setIsRecording(true);
     recognition.onend = () => setIsRecording(false);
-    recognition.onerror = (event: any) => toast.error("Error: " + event.error);
-
+    // recognition.onerror = (event: SpeechRecognitionEvent) => toast.error("Error: " + event.error);
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      toast.error("Error: " + event.error);
+    };
     recognition.start();
 
     recordingTimerRef.current = setTimeout(() => {
@@ -210,13 +221,13 @@ export default function Dashboard() {
             <li className="text-gray-400 p-2 rounded" onClick={() => router.push("/favourites")}>Favourites</li>
           </ul>
         </nav>
-     
-          {/* <p className="text-gray-500">Emmanual Vincent</p> */}
-          <div className="absolute bottom-4 ml-[80px] ">
-            <p className="text-gray-500">{username || "Guest"}</p>
-          </div>
 
-        
+        {/* <p className="text-gray-500">Emmanual Vincent</p> */}
+        <div className="absolute bottom-4 ml-[80px] ">
+          <p className="text-gray-500">{username || "Guest"}</p>
+        </div>
+
+
       </aside>
 
       {/* Main Content */}
@@ -300,6 +311,7 @@ export default function Dashboard() {
           }}
           onRename={(newTitle: string) => {
             // Add your rename logic here
+            console.log(newTitle)
           }}
         />
 

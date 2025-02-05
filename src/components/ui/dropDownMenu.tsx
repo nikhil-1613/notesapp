@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ReactNode, useRef, useEffect } from "react";
+import {  ReactNode, useRef, useEffect } from "react";
 
 interface DropdownMenuProps {
   children: ReactNode;

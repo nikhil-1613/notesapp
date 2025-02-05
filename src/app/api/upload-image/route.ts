@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import { connect } from "@/dbConfig/dbConfig";
 import Note from "@/models/noteModel";
@@ -6,19 +7,22 @@ import { cookies } from "next/headers";
 import cloudinary from "cloudinary";
 import { JwtPayload } from "jsonwebtoken";
 
-// 🔥 Configure Cloudinary
+// Configure Cloudinary
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Define the expected response type from Cloudinary
+interface CloudinaryUploadResponse {
+  secure_url: string;
+}
+
 export async function POST(req: NextRequest) {
   await connect();
 
   try {
-    console.log("🚀 Incoming Image Upload Request");
-
     // Authenticate User
     const token = (await cookies()).get("token");
     if (!token) {
@@ -49,17 +53,16 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Upload to Cloudinary
-    const uploadResponse = await new Promise((resolve, reject) => {
+    const uploadResponse: CloudinaryUploadResponse = await new Promise((resolve, reject) => {
       cloudinary.v2.uploader
         .upload_stream({ folder: "notesapp" }, (error, result) => {
           if (error) reject(error);
-          resolve(result);
+          else resolve(result as CloudinaryUploadResponse);
         })
         .end(buffer);
     });
 
-    const cloudinaryUrl = (uploadResponse as any).secure_url;
-    console.log("📂 Uploaded to Cloudinary:", cloudinaryUrl);
+    const cloudinaryUrl = uploadResponse.secure_url;
 
     // Update note with Cloudinary image URL
     const updatedNote = await Note.findByIdAndUpdate(
@@ -77,37 +80,31 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("❌ Error uploading image:", error);
+    console.error("Error uploading image:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
-//  import { NextRequest, NextResponse } from "next/server";
+// import { NextRequest, NextResponse } from "next/server";
 // import { connect } from "@/dbConfig/dbConfig";
 // import Note from "@/models/noteModel";
 // import { verifyToken } from "@/lib/jwt";
-// import { JwtPayload } from "jsonwebtoken";
 // import { cookies } from "next/headers";
-// import fs from "fs";
-// import path from "path";
+// import cloudinary from "cloudinary";
+// import { JwtPayload } from "jsonwebtoken";
 
-// // Ensure "uploads" directory exists
-// const UPLOADS_DIR = path.join(process.cwd(), "public/uploads");
-// if (!fs.existsSync(UPLOADS_DIR)) {
-//   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-// }
-
-// export const config = {
-//   api: {
-//     bodyParser: false,
-//   },
-// };
+// // 🔥 Configure Cloudinary
+// cloudinary.v2.config({
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//   api_key: process.env.CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET,
+// });
 
 // export async function POST(req: NextRequest) {
 //   await connect();
 
 //   try {
-//     console.log("🚀 Incoming Image Upload Request");
+   
 
 //     // Authenticate User
 //     const token = (await cookies()).get("token");
@@ -127,24 +124,34 @@ export async function POST(req: NextRequest) {
 //     }
 
 //     // Convert request body to a buffer
-//     const data = await req.arrayBuffer();
-//     const buffer = Buffer.from(data);
+//     const formData = await req.formData();
+//     const file = formData.get("image") as File;
 
-//     // Generate a unique filename
-//     const filename = `${Date.now()}-image.png`;
-//     const filePath = path.join(UPLOADS_DIR, filename);
+//     if (!file) {
+//       return NextResponse.json({ error: "No image uploaded" }, { status: 400 });
+//     }
 
-//     // Save file to disk
-//     fs.writeFileSync(filePath, buffer);
-//     console.log("📂 File Saved:", filePath);
+//     // Read file buffer
+//     const arrayBuffer = await file.arrayBuffer();
+//     const buffer = Buffer.from(arrayBuffer);
 
-//     // Generate public URL
-//     const imageUrl = `/uploads/${filename}`;
+//     // Upload to Cloudinary
+//     const uploadResponse = await new Promise((resolve, reject) => {
+//       cloudinary.v2.uploader
+//         .upload_stream({ folder: "notesapp" }, (error, result) => {
+//           if (error) reject(error);
+//           resolve(result);
+//         })
+//         .end(buffer);
+//     });
 
-//     // ✅ Update note in database
+//     const cloudinaryUrl = (uploadResponse as any).secure_url;
+//     // console.log(" Uploaded to Cloudinary:", cloudinaryUrl);
+
+//     // Update note with Cloudinary image URL
 //     const updatedNote = await Note.findByIdAndUpdate(
 //       noteId,
-//       { $set: { imageUrl } }, // ✅ Ensure this is updating
+//       { imageUrl: cloudinaryUrl },
 //       { new: true }
 //     );
 
@@ -152,14 +159,12 @@ export async function POST(req: NextRequest) {
 //       return NextResponse.json({ error: "Note not found" }, { status: 404 });
 //     }
 
-//     // console.log(" Note Updated:", updatedNote);
-
 //     return NextResponse.json(
-//       { message: "Image uploaded successfully", url: imageUrl, note: updatedNote },
+//       { message: "Image uploaded successfully", url: cloudinaryUrl, note: updatedNote },
 //       { status: 200 }
 //     );
 //   } catch (error) {
-//     // console.error(" Error uploading image:", error);
+//     console.error(" Error uploading image:", error);
 //     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
 //   }
 // }

@@ -1,7 +1,7 @@
 // components/ui/Modal.tsx
 
 import { FC } from "react";
-import { Button } from "@/components/ui/button";
+
 
 interface ModalProps {
   isOpen: boolean;
