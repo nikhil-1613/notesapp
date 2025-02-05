@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
+import image from "next/image";
 
 interface Props {
   noteId: string;
@@ -17,38 +19,72 @@ const ImageUpload: React.FC<Props> = ({ noteId }) => {
       setMessage(""); // Reset messages
     }
   };
-
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      setMessage("⚠️ Please select an image first!");
+  const handleUploadImage = async () => {
+    if (!image) {
+      toast.error("No image selected.");
       return;
     }
-
-    const formData = new FormData();
-    formData.append("image", selectedFile);
-    formData.append("noteId", noteId);
-
-    setUploading(true);
-    setMessage(""); // Clear previous messages
-
+  
     try {
-      const response = await axios.post("/api/upload-image", formData, {
+      const formData = new FormData();
+      formData.append("image", selectedFile as Blob);
+  
+      // 🔹 Upload image to Cloudinary
+      const uploadResponse = await axios.post("/api/upload-image", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
-      if (response.status === 200) {
-        setImageUrl(response.data.url);
-        setMessage("✅ Image uploaded successfully!");
+  
+      const updatedImageUrl = uploadResponse.data.url; // Get Cloudinary URL
+  
+      // 🔹 Now update the note with new image URL
+      const updateNoteResponse = await axios.put(`/api/notes/${noteId}`, {
+        imageUrl: updatedImageUrl, // 🔥 Send imageUrl in request
+      });
+  
+      if (updateNoteResponse.status === 200) {
+        setImageUrl(updatedImageUrl);
+        toast.success("✅ Image uploaded and saved successfully!");
       } else {
-        setMessage("⚠️ Failed to upload image.");
+        toast.error("⚠️ Failed to update note.");
       }
     } catch (error) {
-      console.error("Upload failed:", error);
-      setMessage("❌ Error: Could not upload image.");
-    } finally {
-      setUploading(false);
+      console.error("❌ Upload Error:", error);
+      toast.error("Something went wrong.");
     }
   };
+  
+
+  // const handleUpload = async () => {
+  //   if (!selectedFile) {
+  //     setMessage("⚠️ Please select an image first!");
+  //     return;
+  //   }
+
+  //   const formData = new FormData();
+  //   formData.append("image", selectedFile);
+  //   formData.append("noteId", noteId);
+
+  //   setUploading(true);
+  //   setMessage(""); // Clear previous messages
+
+  //   try {
+  //     const response = await axios.post("/api/upload-image", formData, {
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //     });
+
+  //     if (response.status === 200) {
+  //       setImageUrl(response.data.url);
+  //       setMessage("✅ Image uploaded successfully!");
+  //     } else {
+  //       setMessage("⚠️ Failed to upload image.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Upload failed:", error);
+  //     setMessage("❌ Error: Could not upload image.");
+  //   } finally {
+  //     setUploading(false);
+  //   }
+  // };
 
   return (
     <div className="p-4 bg-gray-900 text-white rounded-lg w-full max-w-sm">
@@ -62,11 +98,10 @@ const ImageUpload: React.FC<Props> = ({ noteId }) => {
 
         {/* Upload Button - Always Visible */}
         <button
-          onClick={handleUpload}
+          onClick={handleUploadImage}
           disabled={uploading}
-          className={`mt-2 w-full px-4 py-2 rounded-lg text-white ${
-            uploading ? "bg-gray-600 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
-          }`}
+          className={`mt-2 w-full px-4 py-2 rounded-lg text-white ${uploading ? "bg-gray-600 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+            }`}
         >
           {uploading ? "Uploading..." : "Upload Image"}
         </button>
@@ -79,7 +114,11 @@ const ImageUpload: React.FC<Props> = ({ noteId }) => {
       {imageUrl && (
         <div className="mt-4 flex flex-col items-center">
           <p>Uploaded Image:</p>
-          <img src={imageUrl} alt="Uploaded" className="mt-2 w-40 h-40 object-cover rounded-lg border border-gray-500" />
+          {/* <img src={imageUrl} alt="Uploaded" className="mt-2 w-40 h-40 object-cover rounded-lg border border-gray-500" /> */}
+          {imageUrl && (
+            <img src={imageUrl} alt="Uploaded Image" className="w-40 h-40 rounded-lg" />
+          )}
+
         </div>
       )}
     </div>

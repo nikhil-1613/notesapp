@@ -99,38 +99,71 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
       const formData = new FormData();
       formData.append("image", image);
   
+      // 🔹 Upload to Cloudinary
       const uploadResponse = await axios.post(`/api/upload-image?noteId=${note._id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
   
-      console.log("✅ Upload Response:", uploadResponse.data); // Debugging
-  
       const updatedImageUrl = uploadResponse.data.url;
+      console.log("✅ Image uploaded to Cloudinary:", updatedImageUrl);
+  
+      // 🔹 Update note with new image URL
+      const updateNoteResponse = await axios.put(`/api/notes/${note._id}`, {
+        imageUrl: updatedImageUrl, // Ensure `imageUrl` is sent
+      });
+  
+      console.log("✅ Note Updated:", updateNoteResponse.data);
       setImageUrl(updatedImageUrl);
   
-      // 🔄 Fetch the updated note to ensure imageUrl is stored correctly
-      const updatedNoteResponse = await axios.get(`/api/notes/${note._id}`);
-      console.log("🔄 Updated Note:", updatedNoteResponse.data);
-  
-      setNewTitle(updatedNoteResponse.data.title);
-      setNewContent(updatedNoteResponse.data.content);
-      setNewFavorite(updatedNoteResponse.data.favorite);
-      setImageUrl(updatedNoteResponse.data.imageUrl);
-  
       toast.success("Image uploaded successfully!");
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        console.error("❌ Axios Error:", error.response?.data || error.message);
-        toast.error(error.response?.data?.error || "API request failed.");
-      } else if (error instanceof Error) {
-        console.error("❌ General Error:", error.message);
-        toast.error(error.message || "An unexpected error occurred.");
-      } else {
-        console.error("❌ Unknown Error:", error);
-        toast.error("Something went wrong.");
-      }
+    } catch (error) {
+      console.error("❌ Upload Error:", error);
+      toast.error("Image upload failed.");
     }
   };
+  
+  // const handleUploadImage = async () => {
+  //   if (!image) {
+  //     toast.error("No image selected.");
+  //     return;
+  //   }
+  
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("image", image);
+  
+  //     const uploadResponse = await axios.post(`/api/upload-image?noteId=${note._id}`, formData, {
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //     });
+  
+  //     console.log("✅ Upload Response:", uploadResponse.data); // Debugging
+  
+  //     const updatedImageUrl = uploadResponse.data.url;
+  //     setImageUrl(updatedImageUrl);
+  
+  //     // 🔄 Fetch the updated note to ensure imageUrl is stored correctly
+  //     const updatedNoteResponse = await axios.get(`/api/notes/${note._id}`);
+  //     console.log("🔄 Updated Note:", updatedNoteResponse.data);
+  
+  //     setNewTitle(updatedNoteResponse.data.title);
+  //     setNewContent(updatedNoteResponse.data.content);
+  //     setNewFavorite(updatedNoteResponse.data.favorite);
+  //     setImageUrl(updatedNoteResponse.data.imageUrl);
+  
+  //     toast.success("Image uploaded successfully!");
+  //   } catch (error: unknown) {
+  //     if (axios.isAxiosError(error)) {
+  //       console.error(" Axios Error:", error.response?.data || error.message);
+  //       toast.error(error.response?.data?.error || "API request failed.");
+  //     } else if (error instanceof Error) {
+  //       console.error(" General Error:", error.message);
+  //       toast.error(error.message || "An unexpected error occurred.");
+  //     } else {
+  //       console.error(" Unknown Error:", error);
+  //       toast.error("Something went wrong.");
+  //     }
+  //   }
+  // };
   
   // const handleUploadImage = async () => {
   //   if (!image) {
@@ -218,12 +251,17 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
           )}
         </div>
 
-        {/* {imageUrl && <img src={imageUrl} alt="Uploaded" className="mb-4 w-full h-auto rounded" />} */}
         {imageUrl ? (
-  <img src={imageUrl} alt="Uploaded" className="mb-4 w-full h-auto rounded" />
-) : (
-  <p className="text-gray-500 text-sm mb-4">No image available to display.</p>
-)}
+        <div className="flex justify-center">
+          <img 
+          src={imageUrl} 
+          alt="Uploaded" 
+          className="mb-4 max-w-[80px] max-h-[80px] object-contain rounded border border-gray-300 shadow-sm"
+          />
+          </div>  
+          ) : (
+          <p className="text-gray-500 text-sm mb-4 text-center">No images available to display.</p>
+            )}
 
         <div className="flex justify-between items-center">
           {isMaximized && (

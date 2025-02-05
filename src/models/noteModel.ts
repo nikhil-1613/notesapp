@@ -8,7 +8,7 @@ const NoteSchema = new mongoose.Schema(
     isAudio: { type: Boolean, default: false }, // Flag for audio note
     audioUrl: { type: String }, // If the note is audio, store the audio file URL
     favorite: { type: Boolean, default: false }, // Favorite flag
-    image: { type:String }, // Image stored as a file (optional)
+    imageUrl: { type:String }, // Image stored as a file (optional)
   },
   { timestamps: true }
 );

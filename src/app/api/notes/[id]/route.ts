@@ -7,12 +7,12 @@ import { cookies } from "next/headers";
 
 // The context parameter now correctly contains the `params`
 export async function PUT(req: Request, context: { params: { id: string } }) {
-  await connect();
+  await connect(); // Ensure database connection
 
   try {
-    // Access cookies using cookies API in Next.js 13
     const cookieStore = cookies();
-    const token = (await cookieStore).get("token"); // Access cookies
+    const token = (await cookieStore).get("token");
+
     if (!token) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
@@ -22,20 +22,23 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
       return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
     }
 
-    // Get note data from request body
-    const { title, content, favorite } = await req.json();
+    // 🔹 Parse request body
+    const { title, content, favorite, imageUrl } = await req.json();
 
-    // Wait for params to be resolved before accessing it
-    const { id: noteId } = await context.params; // Explicitly await params to access id
+    // 🔹 Ensure `params` is resolved before accessing
+    const { id: noteId } = context.params;
 
     if (!noteId) {
       return NextResponse.json({ error: "Note ID is required" }, { status: 400 });
     }
 
-    // Find and update the note
+    console.log("🔄 Updating Note ID:", noteId);
+    console.log("🖼️ New Image URL:", imageUrl);
+
+    // 🔹 Find and update the note (ENSURE IMAGE IS UPDATED)
     const updatedNote = await Note.findByIdAndUpdate(
       noteId,
-      { title, content, favorite },
+      { $set: { title, content, favorite, imageUrl } }, // 🔥 Explicitly setting `imageUrl`
       { new: true }
     );
 
@@ -43,12 +46,58 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
       return NextResponse.json({ error: "Note not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Note updated successfully", note: updatedNote }, { status: 200 });
+    console.log("✅ Updated Note:", updatedNote);
+
+    return NextResponse.json({ message: "✅ Note updated successfully", note: updatedNote }, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error updating note:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+// export async function PUT(req: Request, context: { params: { id: string } }) {
+//   await connect();
+
+//   try {
+//     // Access cookies using cookies API in Next.js 13
+//     const cookieStore = cookies();
+//     const token = (await cookieStore).get("token"); // Access cookies
+//     if (!token) {
+//       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+//     }
+
+//     const decoded = verifyToken(token.value) as JwtPayload;
+//     if (!decoded || !decoded.userId) {
+//       return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
+//     }
+
+//     // Get note data from request body
+//     const { title, content, favorite , imageUrl} = await req.json();
+
+//     // Wait for params to be resolved before accessing it
+//     const { id: noteId } = await context.params; // Explicitly await params to access id
+
+//     if (!noteId) {
+//       return NextResponse.json({ error: "Note ID is required" }, { status: 400 });
+//     }
+
+//     // Find and update the note
+//     const updatedNote = await Note.findByIdAndUpdate(
+//       noteId,
+//       { title, content, favorite,imageUrl },
+//       { new: true }
+//     );
+
+//     if (!updatedNote) {
+//       return NextResponse.json({ error: "Note not found" }, { status: 404 });
+//     }
+
+//     return NextResponse.json({ message: "Note updated successfully", note: updatedNote }, { status: 200 });
+//   } catch (error) {
+//     console.error(error);
+//     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+//   }
+// }
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
 
@@ -79,16 +128,16 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   }
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  await connect(); // Ensure DB connection
+
+export async function GET(req: NextRequest, context: { params: { id: string } }) {
+  await connect(); // Ensure database connection
 
   try {
-    console.log("🔄 Fetching Note:", params);
+    // 🔹 Correctly access `params.id`
+    const { id } = await context.params;
+    console.log("🔄 Fetching Note:", id);
 
-    // ✅ Await params before using `id`
-    const { id } = await params;
     const note = await Note.findById(id);
-
     if (!note) {
       return NextResponse.json({ error: "Note not found" }, { status: 404 });
     }
