@@ -65,7 +65,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
     await connect(); // Ensure database connection
 
     // Authenticate the user (check token from cookies)
-    const token = await cookies().get("token");
+    const token = await (await cookies()).get("token");
     if (!token) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
