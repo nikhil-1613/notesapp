@@ -203,7 +203,7 @@ export default function Dashboard() {
     <div className="flex h-screen">
       {/* Sidebar */}
       <aside className="w-64 bg-gray-100 p-4">
-        <h2 className="text-lg font-bold mb-4">AI Notes</h2>
+        <h2 className="text-lg font-bold mb-4">ALL Notes</h2>
         <nav>
           <ul>
             <li className="bg-purple-200 p-2 rounded mb-2">Home</li>
