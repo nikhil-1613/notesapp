@@ -5,10 +5,12 @@ import { verifyToken } from "@/lib/jwt";
 import { JwtPayload } from "jsonwebtoken";
 import { cookies } from "next/headers";
 
+// Define the ParamType as before
 type ParamType = {
   id: string;
 };
 
+// Wrap the params in a Promise if that's what the types expect
 export async function PUT(req: NextRequest, { params }: { params: ParamType }) {
   await connect();
 
@@ -21,7 +23,7 @@ export async function PUT(req: NextRequest, { params }: { params: ParamType }) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await Promise.resolve(params); // Wrap params in a Promise
     const { favorite } = await req.json();
 
     // Update the note's favorite status
