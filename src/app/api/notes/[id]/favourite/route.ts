@@ -5,26 +5,22 @@ import { verifyToken } from "@/lib/jwt";
 import { JwtPayload } from "jsonwebtoken";
 import { cookies } from "next/headers";
 
-// Define RouteContext type explicitly
-interface RouteContext {
-  params: {
-    id: string;
-  };
-}
-
-export async function PUT(req: NextRequest, context: RouteContext) {
+// Corrected function signature for Next.js route handling
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   await connect();
 
   try {
     const token = (await cookies()).get("token");
-    if (!token) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    if (!token) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
 
     const decoded = verifyToken(token.value) as JwtPayload;
     if (!decoded || !decoded.userId) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const { id } = context.params; // Correct way to access params
+    const { id } = params; // Correctly access params
     const { favorite } = await req.json();
 
     const updatedNote = await Note.findByIdAndUpdate(id, { favorite }, { new: true });
