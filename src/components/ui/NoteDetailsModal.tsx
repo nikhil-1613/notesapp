@@ -50,7 +50,7 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
       await navigator.clipboard.writeText(note.content);
       toast.success("Note copied to clipboard!");
     } catch (error) {
-      console.log("Error in copying text to clipboard")
+      console.log("Error in copying text to clipboard",error)
       toast.error("Failed to copy text.");
     }
   };
@@ -134,6 +134,7 @@ const NoteDetailsModal: React.FC<NoteDetailsModalProps> = ({ isOpen, note, onClo
       await axios.put(`/api/notes/${note._id}/favourite`, { favorite: updatedFavorite });
       toast.success(updatedFavorite ? "Added to Favorites!" : "Removed from Favorites!");
     } catch (error) {
+      console.log("error in updates",error)
       toast.error("Error updating favorite.");
     }
   };

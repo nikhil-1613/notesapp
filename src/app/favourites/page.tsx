@@ -156,12 +156,14 @@ export default function Favourites() {
           isOpen={isNoteDetailsModalOpen}
           note={selectedNote}
           onClose={closeNoteDetails}
-          favourite={selectedNote?.favorite || false}
+          // favourite={selectedNote?.favorite || false}
           onDelete={() => {
             // Add your delete logic here
           }}
           onRename={(newTitle: string) => {
             // Add your rename logic here
+          
+            console.log(newTitle)
           }}
         />
       </main>
