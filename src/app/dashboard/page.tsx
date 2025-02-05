@@ -30,9 +30,25 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
-
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [isNoteDetailsModalOpen, setIsNoteDetailsModalOpen] = useState(false);
+  const [username, setUsername] = useState("");
+
+ 
+
+  useEffect(() => {
+      const fetchUser = async () => {
+          try {
+              const res = await axios.get("/api/auth/me", { withCredentials: true });
+              setUsername(res.data.user.userName);
+          } catch (error) {
+              console.error("Failed to fetch user", error);
+          }
+      };
+      fetchUser();
+  }, []);
+  
+
 
   const openNoteDetails = (note: Note) => {
     setSelectedNote(note);
@@ -194,9 +210,13 @@ export default function Dashboard() {
             <li className="text-gray-400 p-2 rounded" onClick={() => router.push("/favourites")}>Favourites</li>
           </ul>
         </nav>
-        <div className="absolute bottom-4">
-          <p className="text-gray-500">Emmanual Vincent</p>
-        </div>
+     
+          {/* <p className="text-gray-500">Emmanual Vincent</p> */}
+          <div className="absolute bottom-4 ml-[80px] ">
+            <p className="text-gray-500">{username || "Guest"}</p>
+          </div>
+
+        
       </aside>
 
       {/* Main Content */}
@@ -271,11 +291,10 @@ export default function Dashboard() {
         </div>
 
         {/* Note Details Modal */}
-        <NoteDetailsModal 
-          isOpen={isNoteDetailsModalOpen} 
-          note={selectedNote} 
-          onClose={closeNoteDetails} 
-          favourite={selectedNote?.favorite || false}
+        <NoteDetailsModal
+          isOpen={isNoteDetailsModalOpen}
+          note={selectedNote}
+          onClose={closeNoteDetails}
           onDelete={() => {
             // Add your delete logic here
           }}
@@ -284,17 +303,6 @@ export default function Dashboard() {
           }}
         />
 
-        {/* <div className="grid grid-cols-2 gap-4">
-          {filteredNotes.map((note) => (
-            <Card key={note._id} className="p-4 cursor-pointer" onClick={() => openNoteDetails(note)}>
-              <CardContent>
-                <p className="text-gray-500 text-sm">{new Date(note.createdAt).toLocaleString()}</p>
-                <h3 className="font-semibold">{note.title || "Untitled Audio Note"}</h3>
-                <p className="text-gray-700">{note.content}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div> */}
       </main>
 
       {/* Bottom Bar */}

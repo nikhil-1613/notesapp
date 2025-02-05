@@ -1,9 +1,8 @@
 "use client"
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-
 
 export default function Login() {
     const router = useRouter();
@@ -17,14 +16,13 @@ export default function Login() {
             const res = await axios.post("/api/auth/login", { email, password });
             if (res.status === 200) {
                 toast.success("Login successful! Redirecting...");
+                localStorage.setItem("username",res.data.userName);
                 setTimeout(() => router.push("/dashboard"), 1500);
             }
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                // If the error is an AxiosError
                 toast.error(err.response?.data?.error || "Login failed");
             } else {
-                // For non-Axios errors (e.g., network errors or others)
                 toast.error("An unexpected error occurred");
             }
         }
@@ -51,6 +49,14 @@ export default function Login() {
                     required
                 />
                 <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full">Login</button>
+
+                {/* Clickable entire text to navigate to Signup */}
+                <p 
+                    className="text-blue-400 text-center mt-4 cursor-pointer hover:underline"
+                    onClick={() => router.push("/signup")}
+                >
+                    Don't have an account? Create now
+                </p>
             </form>
         </div>
     );

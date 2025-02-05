@@ -1,5 +1,6 @@
+
 "use client"
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -8,23 +9,21 @@ export default function Signup() {
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [userName, setuserName] = useState(""); 
+    const [userName, setUserName] = useState(""); 
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            const res = await axios.post("/api/auth/signup", { email, password,userName });
+            const res = await axios.post("/api/auth/signup", { email, password, userName });
             if (res.status === 201) {
                 toast.success("Signup successful! Redirecting...");
                 setTimeout(() => router.push("/login"), 1500);
             }
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                // If the error is an AxiosError
                 toast.error(err.response?.data?.error || "Signup failed");
             } else {
-                // For non-Axios errors (e.g., network errors or others)
                 toast.error("An unexpected error occurred");
             }
         }
@@ -51,14 +50,22 @@ export default function Signup() {
                     required
                 />
                 <input
-                    type="userName"
-                    placeholder="userName"
+                    type="text"
+                    placeholder="Username"
                     className="border p-2 rounded w-full mb-2"
                     value={userName}
-                    onChange={(e) => setuserName(e.target.value)}
+                    onChange={(e) => setUserName(e.target.value)}
                     required
                 />
                 <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full">Signup</button>
+
+                {/* Clickable entire text */}
+                <p 
+                    className="text-blue-400 text-center mt-4 cursor-pointer hover:underline"
+                    onClick={() => router.push("/login")}
+                >
+                    Already have an account? Let's login
+                </p>
             </form>
         </div>
     );
