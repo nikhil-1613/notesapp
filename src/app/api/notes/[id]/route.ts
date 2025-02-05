@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connect } from "@/dbConfig/dbConfig"; // Adjust this based on your actual path
 import Note from "@/models/noteModel"; // Adjust based on your model
 import { verifyToken } from "@/lib/jwt"; // Adjust based on your utils
@@ -44,6 +44,35 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
     }
 
     return NextResponse.json({ message: "Note updated successfully", note: updatedNote }, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const { id } = params;
+
+  try {
+    await connect();
+
+    // Authenticate the user (check token from cookies)
+    const token = (await cookies()).get("token");
+    if (!token) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
+
+    const decoded = verifyToken(token.value);
+    if (!decoded) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 403 });
+    }
+
+    // Proceed with deleting the note
+    const note = await Note.findByIdAndDelete(id);
+    if (!note) {
+      return NextResponse.json({ error: "Note not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Note deleted successfully" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
