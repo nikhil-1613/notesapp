@@ -33,8 +33,8 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
       return NextResponse.json({ error: "Note ID is required" }, { status: 400 });
     }
 
-    console.log("🔄 Updating Note ID:", noteId);
-    console.log("🖼️ New Image URL:", imageUrl);
+    console.log(" Updating Note ID:", noteId);
+    console.log(" New Image URL:", imageUrl);
 
     // Find and update the note (ENSURE IMAGE IS UPDATED)
     const updatedNote = await Note.findByIdAndUpdate(
@@ -47,11 +47,11 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
       return NextResponse.json({ error: "Note not found" }, { status: 404 });
     }
 
-    console.log("✅ Updated Note:", updatedNote);
+    console.log(" Updated Note:", updatedNote);
 
-    return NextResponse.json({ message: "✅ Note updated successfully", note: updatedNote }, { status: 200 });
+    return NextResponse.json({ message: " Note updated successfully", note: updatedNote }, { status: 200 });
   } catch (error) {
-    console.error("❌ Error updating note:", error);
+    console.error(" Error updating note:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
@@ -87,35 +87,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
-// export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-//   const { id } = params;
 
-//   try {
-//     await connect();
-
-//     // Authenticate the user (check token from cookies)
-//     const token = (await cookies()).get("token");
-//     if (!token) {
-//       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-//     }
-
-//     const decoded = verifyToken(token.value);
-//     if (!decoded) {
-//       return NextResponse.json({ error: "Invalid token" }, { status: 403 });
-//     }
-
-//     // Proceed with deleting the note
-//     const note = await Note.findByIdAndDelete(id);
-//     if (!note) {
-//       return NextResponse.json({ error: "Note not found" }, { status: 404 });
-//     }
-
-//     return NextResponse.json({ message: "Note deleted successfully" }, { status: 200 });
-//   } catch (error) {
-//     console.error(error);
-//     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-//   }
-// }
 
 // Define the GET handler with async params
 export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
@@ -139,22 +111,3 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
 }
 
 
-// export async function GET(req: NextRequest, context: { params: { id: string } }) {
-//   await connect(); // Ensure database connection
-
-//   try {
-//     // 🔹 Correctly access `params.id`
-//     const { id } = await context.params;
-//     console.log("🔄 Fetching Note:", id);
-
-//     const note = await Note.findById(id);
-//     if (!note) {
-//       return NextResponse.json({ error: "Note not found" }, { status: 404 });
-//     }
-
-//     return NextResponse.json(note, { status: 200 });
-//   } catch (error) {
-//     console.error("❌ Error fetching note:", error);
-//     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-//   }
-// }
